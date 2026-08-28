@@ -21,9 +21,22 @@ redis-gitops/
     │   └── manual/                  # NOT ArgoCD-managed: ResourceQuota, LimitRange
     │                                 # (platform RBAC blocks the controller from
     │                                 # creating these — see manual/README.md)
-    ├── redis-app/                   # cache tier (sync-wave 1) — TODO
-    └── redis-db/                    # db tier (sync-wave 1) — TODO
+    ├── redis-app/                   # cache tier (sync-wave 1)
+    │   ├── application.yaml
+    │   ├── base/                    # Deployment, Service, PodDisruptionBudget
+    │   └── overlays/dev/            # what redis-app-appl actually points to
+    └── redis-db/                    # db tier (sync-wave 1)
+        ├── application.yaml
+        ├── base/                    # StatefulSet, Service, PodDisruptionBudget
+        └── overlays/dev/            # what redis-db-appl actually points to
 ```
 
-`apps/redis-app/` and `apps/redis-db/` aren't populated yet — see the LLD's
-Phase E/F for what belongs there.
+All three Applications (`redis-platform-appl`, `redis-app-appl`, `redis-db-appl`)
+and their manifests are present. `apps/redis-platform/manual/` still needs a
+one-time `oc apply` — see that folder's README.
+
+Validate any tree renders cleanly before applying:
+```bash
+oc kustomize apps/redis-app/overlays/dev
+oc kustomize apps/redis-db/overlays/dev
+```
