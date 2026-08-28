@@ -17,7 +17,10 @@ redis-gitops/
 └── apps/
     ├── redis-platform/              # namespace + governance (sync-wave 0)
     │   ├── application.yaml
-    │   └── base/
+    │   ├── base/                    # ArgoCD-managed: namespace, NetworkPolicy
+    │   └── manual/                  # NOT ArgoCD-managed: ResourceQuota, LimitRange
+    │                                 # (platform RBAC blocks the controller from
+    │                                 # creating these — see manual/README.md)
     ├── redis-app/                   # cache tier (sync-wave 1) — TODO
     └── redis-db/                    # db tier (sync-wave 1) — TODO
 ```
