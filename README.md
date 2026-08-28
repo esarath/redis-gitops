@@ -4,7 +4,7 @@ ArgoCD source repository for the Redis (app + db tier) deployment on
 `lab.ocp.local`, managed via OpenShift GitOps.
 
 Full design (LLD), review history, and rationale live in
-[`OCP_Issue-Fix_RCA` issue 15](https://github.com/esarath/OCP_Issue-Fix_RCA/tree/main/issues/15-redis-app-db-gitops-deployment) —
+[`OCP_Issue-Fix_RCA` issue 15](https://github.com/esarath/OCP_Issue-Fix_RCA/blob/main/issues/15-redis-app-db-gitops-deployment/Redis-OCP-GitOps-LLD.md) —
 this repo holds only the manifests ArgoCD actually syncs.
 
 ## Layout
