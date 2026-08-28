@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: redis-project
+  namespace: openshift-gitops
+spec:
+  description: Redis platform + app + db GitOps project
+  sourceRepos:
+    - 'https://github.com/esarath/redis-gitops.git'
+  destinations:
+    - namespace: redis-platform
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

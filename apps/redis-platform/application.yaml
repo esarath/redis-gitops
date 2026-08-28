@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-platform-appl
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: redis-project
+  source:
+    repoURL: 'https://github.com/esarath/redis-gitops.git'
+    targetRevision: main
+    path: apps/redis-platform/base
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis-platform
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
