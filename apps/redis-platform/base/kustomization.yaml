@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - networkpolicy.yaml
+  - monitoring
 # resourcequota.yaml and limitrange.yaml are intentionally NOT here — see
 # ../manual/README.md. ArgoCD's auto-granted namespace role can't create
 # those two kinds even with admin rights on everything else.

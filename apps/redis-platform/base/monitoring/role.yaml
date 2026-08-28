@@ -1,0 +1,14 @@
+# Namespace-scoped, resource-scoped on purpose: this instance only needs to
+# read PodDisruptionBudget status, not the full kube-state-metrics resource
+# set. See ../../manual/README.md for why we can't just use the platform
+# kube-state-metrics instead (its metrics aren't visible to User Workload
+# Monitoring, which is what evaluates PrometheusRules in this namespace).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kube-state-metrics-redis
+  namespace: redis-platform
+rules:
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "watch"]

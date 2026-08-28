@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics-redis
+  namespace: redis-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: kube-state-metrics-redis }
+  template:
+    metadata:
+      labels: { app: kube-state-metrics-redis }
+    spec:
+      serviceAccountName: kube-state-metrics-redis
+      containers:
+        - name: kube-state-metrics
+          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.13.0
+          args:
+            - --namespaces=redis-platform
+            - --resources=poddisruptionbudgets
+            - --port=8080
+            - --telemetry-port=8081
+          ports:
+            - name: metrics
+              containerPort: 8080
+            - name: telemetry
+              containerPort: 8081
+          resources:
+            requests: { cpu: 10m, memory: 32Mi }
+            limits: { cpu: 100m, memory: 128Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault

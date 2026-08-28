@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: redis-pdb-alerts
+  namespace: redis-platform
+  labels:
+    app: kube-state-metrics-redis
+spec:
+  groups:
+    - name: redis-pdb.rules
+      rules:
+        - alert: RedisPodDisruptionBudgetUnhealthy
+          expr: |
+            kube_poddisruptionbudget_status_current_healthy{namespace="redis-platform"}
+              < kube_poddisruptionbudget_status_desired_healthy{namespace="redis-platform"}
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "PodDisruptionBudget {{ $labels.poddisruptionbudget }} in redis-platform has fewer healthy pods than desired"
+            description: "PDB {{ $labels.poddisruptionbudget }} has been below its desired healthy pod count for 5+ minutes. The redis tier it protects is degraded, not just at reduced disruption tolerance."
+        - alert: RedisAppPDBAtZeroDisruptions
+          expr: |
+            kube_poddisruptionbudget_status_disruptions_allowed{namespace="redis-platform", poddisruptionbudget="redis-app"} == 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "redis-app PDB allows zero voluntary disruptions"
+            description: "redis-app normally runs 2 replicas with 1 allowed disruption. Zero allowed disruptions for 10+ minutes means it's down to a single healthy replica -- a node drain or voluntary eviction right now would be blocked, and any further pod loss is unprotected. (redis-db is deliberately excluded from this alert: at 1 replica by design, 0 allowed disruptions is its normal steady state, not a signal.)"

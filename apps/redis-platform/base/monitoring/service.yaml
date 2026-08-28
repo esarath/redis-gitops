@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-state-metrics-redis
+  namespace: redis-platform
+  labels:
+    app: kube-state-metrics-redis
+spec:
+  selector: { app: kube-state-metrics-redis }
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: 8080
