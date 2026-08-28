@@ -1,0 +1,24 @@
+# The namespace-wide default-deny-ingress policy (../networkpolicy.yaml)
+# blocks all cross-namespace traffic, including User Workload Monitoring's
+# Prometheus (openshift-user-workload-monitoring), which is what actually
+# scrapes this ServiceMonitor's target. Without this, the PDB metrics/alerts
+# in this folder are deployed but Prometheus can never reach them.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring-scrape
+  namespace: redis-platform
+spec:
+  podSelector:
+    matchLabels:
+      app: kube-state-metrics-redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-user-workload-monitoring
+      ports:
+        - protocol: TCP
+          port: 8080
