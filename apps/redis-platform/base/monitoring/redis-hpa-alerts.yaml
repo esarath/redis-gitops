@@ -61,7 +61,7 @@ spec:
             delta(kube_horizontalpodautoscaler_status_current_replicas{namespace="redis-platform",horizontalpodautoscaler="redis-db"}[5m]) > 0
           for: 1m
           labels:
-            severity: info
+            severity: critical
             team: redis
           annotations:
             summary: "HPA redis-db scaled up"
@@ -72,7 +72,7 @@ spec:
             delta(kube_horizontalpodautoscaler_status_current_replicas{namespace="redis-platform",horizontalpodautoscaler="redis-db"}[5m]) < 0
           for: 1m
           labels:
-            severity: info
+            severity: critical
             team: redis
           annotations:
             summary: "HPA redis-db scaled down"
