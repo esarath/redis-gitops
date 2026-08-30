@@ -1,0 +1,55 @@
+# apps/monitoring/redis-hpa-alerts.yaml  (Git repo, synced via ArgoCD)
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: redis-hpa-alerts
+  namespace: redis-platform
+  labels:
+    role: alert-rules
+spec:
+  groups:
+    - name: hpa.rules
+      rules:
+        - alert: HPAScalingLimited
+          expr: |
+            kube_horizontalpodautoscaler_status_condition{condition="ScalingLimited",status="true"} == 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "HPA {{ $labels.horizontalpodautoscaler }} is scaling-limited"
+            description: "HPA in namespace {{ $labels.namespace }} has been unable to scale further for 10m."
+
+        - alert: HPAAtMaxReplicas
+          expr: |
+            kube_horizontalpodautoscaler_status_current_replicas
+              == kube_horizontalpodautoscaler_spec_max_replicas
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "HPA {{ $labels.horizontalpodautoscaler }} pinned at max replicas"
+            description: "Consider raising maxReplicas or investigating sustained load."
+
+        - alert: HPAUnableToScale
+          expr: |
+            kube_horizontalpodautoscaler_status_condition{condition="AbleToScale",status="false"} == 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "HPA {{ $labels.horizontalpodautoscaler }} cannot scale"
+            description: "Metrics pipeline or scaling controller issue — investigate immediately."
+
+        - alert: HPAReplicaMismatch
+          expr: |
+            abs(
+              kube_horizontalpodautoscaler_status_current_replicas
+              - kube_horizontalpodautoscaler_status_desired_replicas
+            ) > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "HPA {{ $labels.horizontalpodautoscaler }} not converging"
+            description: "Current replicas differ from desired for 15m — check scheduling/quota."
