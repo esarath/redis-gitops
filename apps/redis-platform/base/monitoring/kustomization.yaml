@@ -8,4 +8,5 @@ resources:
   - service.yaml
   - servicemonitor.yaml
   - prometheusrule.yaml
+  - redis-hpa-alerts.yaml
   - networkpolicy.yaml
