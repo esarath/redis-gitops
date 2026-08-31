@@ -20,3 +20,9 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=false
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      name: redis-db
+      jsonPointers:
+        - /spec/replicas

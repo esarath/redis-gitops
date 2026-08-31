@@ -1,0 +1,60 @@
+# apps/monitoring/redis-hpa-dashboard.yaml  (Git repo, synced via ArgoCD)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-hpa-dashboard
+  namespace: openshift-config-managed
+  labels:
+    console.openshift.io/dashboard: "true"
+data:
+  redis-hpa-dashboard.json: |
+    {
+      "annotations": { "list": [] },
+      "editable": false,
+      "panels": [
+        {
+          "title": "HPA Replicas — Current vs Desired vs Max",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"redis-platform\"}",
+              "legendFormat": "current - {{horizontalpodautoscaler}}"
+            },
+            {
+              "expr": "kube_horizontalpodautoscaler_status_desired_replicas{namespace=\"redis-platform\"}",
+              "legendFormat": "desired - {{horizontalpodautoscaler}}"
+            },
+            {
+              "expr": "kube_horizontalpodautoscaler_spec_max_replicas{namespace=\"redis-platform\"}",
+              "legendFormat": "max - {{horizontalpodautoscaler}}"
+            }
+          ]
+        },
+        {
+          "title": "HPA Scaling Limited (1 = blocked)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "targets": [
+            {
+              "expr": "kube_horizontalpodautoscaler_status_condition{namespace=\"redis-platform\",condition=\"ScalingLimited\",status=\"true\"}",
+              "legendFormat": "{{horizontalpodautoscaler}}"
+            }
+          ]
+        },
+        {
+          "title": "HPA Able To Scale (0 = broken)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "targets": [
+            {
+              "expr": "kube_horizontalpodautoscaler_status_condition{namespace=\"redis-platform\",condition=\"AbleToScale\",status=\"true\"}",
+              "legendFormat": "{{horizontalpodautoscaler}}"
+            }
+          ]
+        }
+      ],
+      "schemaVersion": 30,
+      "title": "Redis Platform — HPA Overview",
+      "uid": "redis-hpa-overview"
+    }
